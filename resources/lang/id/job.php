@@ -14,6 +14,11 @@ return [
     'tasks_count'   => 'Jumlah Task',
     'empty'         => 'Belum ada Job',
     'back_to_index' => 'Kembali ke daftar Job',
+    'starts'        => 'Mulai',
+    'ends'          => 'Selesai',
+    'target'        => 'Target',
+    'actual'        => 'Aktual',
+    'duration'      => 'Durasi',
 
     // Actions
     'create'                 => 'Input Job Baru',
@@ -33,12 +38,16 @@ return [
     'created_from_other_project' => 'Berhasil tambah job dari Project lain.',
 
     // Attributes
-    'name'        => 'Nama Job',
-    'description' => 'Deskripsi',
-    'progress'    => 'Progress',
-    'worker'      => 'Pekerja',
-    'price'       => 'Biaya Pengerjaan',
-    'type'        => 'Jenis Job',
+    'name'              => 'Nama Job',
+    'description'       => 'Deskripsi',
+    'progress'          => 'Progress',
+    'worker'            => 'Pekerja',
+    'price'             => 'Biaya Pengerjaan',
+    'type'              => 'Jenis Job',
+    'target_start_date' => 'Target Tgl Mulai',
+    'target_end_date'   => 'Target Tgl Selesai',
+    'actual_start_date' => 'Tgl Mulai Aktual',
+    'actual_end_date'   => 'Tgl Selesai Aktual',
 
     // Types
     'main'       => 'Utama',

@@ -3,9 +3,12 @@
 namespace Tests\Feature\Auth;
 
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ChangePasswordTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function member_can_change_password()
     {
@@ -21,12 +24,12 @@ class ChangePasswordTest extends TestCase
         ]);
         $this->see(trans('auth.old_password_failed'));
         $this->assertTrue(
-            app('hash')->check('member', $user->password),
+            app('hash')->check('secret', $user->password),
             'The password shouldn\'t changed!'
         );
 
         $this->submitForm(trans('auth.change_password'), [
-            'old_password'          => 'member',
+            'old_password'          => 'secret',
             'password'              => 'rahasia',
             'password_confirmation' => 'rahasia',
         ]);

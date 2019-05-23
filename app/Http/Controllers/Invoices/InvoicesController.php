@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Invoices;
 
-use Option;
 use App\Entities\Invoices\Invoice;
 use App\Entities\Projects\Project;
 use App\Http\Controllers\Controller;
+use App\Entities\Invoices\BankAccount;
 
 /**
  * Invoices Controller.
@@ -16,7 +16,9 @@ class InvoicesController extends Controller
 {
     public function index()
     {
-        $invoices = Invoice::paginate();
+        $invoices = Invoice::orderBy('date', 'desc')
+            ->with('project.customer')
+            ->paginate();
 
         return view('invoices.index', compact('invoices'));
     }
@@ -36,11 +38,15 @@ class InvoicesController extends Controller
     public function update(Invoice $invoice)
     {
         $invoiceData = request()->validate([
-            'project_id' => 'required|exists:projects,id',
-            'date'       => 'required|date',
-            'due_date'   => 'nullable|date|after:date',
-            'notes'      => 'nullable|string|max:255',
+            'project_id'     => 'required|exists:projects,id',
+            'date'           => 'required|date',
+            'due_date'       => 'nullable|date|after:date',
+            'discount'       => 'nullable|numeric',
+            'discount_notes' => 'nullable|string|max:255',
+            'notes'          => 'nullable|string|max:255',
         ]);
+        $invoiceSubtotal = collect($invoice->items)->sum('amount');
+        $invoiceData['amount'] = $invoiceSubtotal - $invoiceData['discount'];
 
         $invoice->update($invoiceData);
 
@@ -68,7 +74,7 @@ class InvoicesController extends Controller
 
     public function pdf(Invoice $invoice)
     {
-        $bankAccounts = json_decode(Option::get('bank_accounts')) ?: [];
+        $bankAccounts = BankAccount::where('is_active', 1)->get();
 
         return view('invoices.pdf', compact('invoice', 'bankAccounts'));
     }

@@ -5,8 +5,10 @@ namespace Tests\Unit\Models;
 use Tests\TestCase;
 use App\Entities\Projects\Job;
 use App\Entities\Projects\Task;
+use App\Entities\Projects\Comment;
 use App\Entities\Projects\Project;
 use Illuminate\Support\Collection;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /**
  * Job Model Unit Test.
@@ -15,6 +17,8 @@ use Illuminate\Support\Collection;
  */
 class JobTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function a_job_has_name_link_method()
     {
@@ -51,6 +55,19 @@ class JobTest extends TestCase
     }
 
     /** @test */
+    public function job_deletion_also_deletes_related_tasks()
+    {
+        $job = factory(Job::class)->create();
+        $task = factory(Task::class)->create(['job_id' => $job->id]);
+
+        $job->delete();
+
+        $this->dontSeeInDatabase('tasks', [
+            'job_id' => $job->id,
+        ]);
+    }
+
+    /** @test */
     public function a_job_has_progress_attribute()
     {
         $job = factory(Job::class)->create();
@@ -79,5 +96,35 @@ class JobTest extends TestCase
 
         // Job receiveable earning = job tasks average progress (%) * job price
         $this->assertEquals(750, $job->receiveable_earning);
+    }
+
+    /** @test */
+    public function a_job_has_many_comments_relation()
+    {
+        $job = factory(Job::class)->create();
+        $comment = factory(Comment::class)->create([
+            'commentable_type' => 'jobs',
+            'commentable_id'   => $job->id,
+        ]);
+
+        $this->assertInstanceOf(Collection::class, $job->comments);
+        $this->assertInstanceOf(Comment::class, $job->comments->first());
+    }
+
+    /** @test */
+    public function job_deletion_also_deletes_related_comments()
+    {
+        $job = factory(Job::class)->create();
+        $comment = factory(Comment::class)->create([
+            'commentable_type' => 'jobs',
+            'commentable_id'   => $job->id,
+        ]);
+
+        $job->delete();
+
+        $this->dontSeeInDatabase('comments', [
+            'commentable_type' => 'jobs',
+            'commentable_id'   => $job->id,
+        ]);
     }
 }

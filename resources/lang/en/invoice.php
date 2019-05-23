@@ -22,6 +22,7 @@ return [
     'save'                => 'Save Invoice',
     'created'             => 'New Invoice has been created.',
     'show'                => 'View Invoice Detail',
+    'duplicate'           => 'Duplicate Invoice',
     'edit'                => 'Edit Invoice',
     'update'              => 'Update Invoice',
     'updated'             => 'Invoice data has been updated.',
@@ -55,4 +56,7 @@ return [
     'item_description' => 'Description',
     'item_amount'      => 'Amount',
     'items_count'      => 'Item Count',
+    'subtotal'         => 'Subtotal',
+    'discount'         => 'Discount',
+    'discount_notes'   => 'Discount Notes',
 ];

@@ -4,9 +4,12 @@ namespace Tests\Feature\Auth;
 
 use Tests\TestCase;
 use App\Entities\Users\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class LoginTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function user_can_login_and_logout()
     {
@@ -16,7 +19,7 @@ class LoginTest extends TestCase
 
         $this->submitForm(trans('auth.login'), [
             'email'    => 'email@mail.com',
-            'password' => 'member',
+            'password' => 'secret',
         ]);
 
         $this->see(trans('auth.welcome', ['name' => $user->name]));

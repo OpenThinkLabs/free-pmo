@@ -3,6 +3,7 @@
 namespace Tests\Feature\Users;
 
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /**
  * Site Options Feature Test.
@@ -11,6 +12,8 @@ use Tests\TestCase;
  */
 class SiteOptionsTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function admin_user_can_visit_site_options_page()
     {
@@ -26,7 +29,8 @@ class SiteOptionsTest extends TestCase
         $this->visit(route('site-options.page-1'));
 
         $this->submitForm(trans('app.update'), [
-            'money_sign' => '$',
+            'money_sign'         => '$',
+            'money_sign_in_word' => 'Dollars',
         ]);
 
         $this->see(trans('option.updated'));
@@ -35,6 +39,11 @@ class SiteOptionsTest extends TestCase
         $this->seeInDatabase('site_options', [
             'key'   => 'money_sign',
             'value' => '$',
+        ]);
+
+        $this->seeInDatabase('site_options', [
+            'key'   => 'money_sign_in_word',
+            'value' => 'Dollars',
         ]);
     }
 }

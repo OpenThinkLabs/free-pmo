@@ -7,6 +7,7 @@ use App\Entities\Projects\Project;
 use App\Entities\Partners\Customer;
 use App\Services\InvoiceDrafts\Item;
 use App\Services\InvoiceDrafts\InvoiceDraft;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Services\InvoiceDrafts\InvoiceDraftCollection;
 
 /**
@@ -16,6 +17,8 @@ use App\Services\InvoiceDrafts\InvoiceDraftCollection;
  */
 class InvoiceEntryTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function user_can_visit_invoice_drafts_page()
     {
@@ -84,7 +87,7 @@ class InvoiceEntryTest extends TestCase
 
         $this->seePageIs(route('invoice-drafts.show', $draft->draftKey));
         $this->assertEquals(5000, $draft->getTotal());
-        $this->see(formatRp(5000));
+        $this->see(format_money(5000));
     }
 
     /** @test */
@@ -134,7 +137,7 @@ class InvoiceEntryTest extends TestCase
 
         $this->assertEquals(200, $draft->getTotal());
 
-        $this->see(formatRp($draft->getTotal()));
+        $this->see(format_money($draft->getTotal()));
     }
 
     /** @test */
@@ -171,7 +174,7 @@ class InvoiceEntryTest extends TestCase
         $this->see($project->name);
         $this->see($project->customer->name);
         $this->see($draft->notes);
-        $this->see(formatRp(3000));
+        $this->see(format_money(3000));
         $this->seeElement('input', ['id' => 'save-invoice-draft']);
     }
 

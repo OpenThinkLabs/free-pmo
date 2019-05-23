@@ -10,15 +10,15 @@
     {{ trans('project.index_title', ['status' => $status]) }} <small>{{ $projects->total() }} {{ trans('project.found') }}</small>
 </h1>
 <div class="well well-sm text-right">
-    <div class="pull-left hidden-xs">{{ $projects->appends(Request::except('page'))->render() }}</div>
+    <div class="pull-left hidden-xs">@include('projects.partials.index-nav-tabs')</div>
     {!! Form::open(['method' => 'get', 'class' => 'form-inline']) !!}
-    {!! FormField::select('status_id', ProjectStatus::toArray(), ['value' => $statusId, 'placeholder' => trans('project.all')]) !!}
+    {{ Form::hidden('status_id') }}
     {!! Form::text('q', Request::get('q'), ['class' => 'form-control index-search-field', 'placeholder' => trans('project.search'), 'style' => 'width:100%;max-width:350px']) !!}
     {!! Form::submit(trans('project.search'), ['class' => 'btn btn-info btn-sm']) !!}
     {!! link_to_route('projects.index', __('app.reset'), Request::only(['status_id']), ['class' => 'btn btn-default btn-sm']) !!}
     {!! Form::close() !!}
 </div>
-<div class="table-responsive">
+<div class="panel panel-default table-responsive">
     <table class="table table-condensed table-hover">
         <thead>
             <th>{{ trans('app.table_no') }}</th>
@@ -42,13 +42,13 @@
                 <td>{{ $projects->firstItem() + $key }}</td>
                 <td>{{ $project->nameLink() }}</td>
                 <td class="text-center">{{ $project->start_date }}</td>
-                <td class="text-right">{{ $project->present()->workDuration }}</td>
+                <td class="text-right">{{ $project->work_duration }}</td>
                 @if (request('status_id') == 2)
-                <td class="text-right">{{ formatDecimal($project->getJobOveralProgress()) }} %</td>
+                <td class="text-right">{{ format_decimal($project->getJobOveralProgress()) }} %</td>
                 <td class="text-center">{{ $project->due_date }}</td>
                 @endif
                 @can('see-pricings', new App\Entities\Projects\Project)
-                <td class="text-right">{{ formatRp($project->project_value) }}</td>
+                <td class="text-right">{{ format_money($project->project_value) }}</td>
                 @endcan
                 <td class="text-center">{{ $project->present()->status }}</td>
                 <td>{{ $project->customer->name }}</td>

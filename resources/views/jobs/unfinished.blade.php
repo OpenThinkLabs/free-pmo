@@ -3,9 +3,17 @@
 @section('title', __('job.on_progress'))
 
 @section('content')
-<h1 class="page-header">{{ __('job.on_progress') }}</h1>
 
-<div class="panel panel-default">
+<ul class="breadcrumb hidden-print"><li>{{ __('job.on_progress') }}</li></ul>
+
+<div class="panel panel-default table-responsive">
+    <div class="panel-heading">
+        {{ Form::open(['method' => 'get', 'class' => 'form-inline']) }}
+        {!! FormField::select('project_id', $projects, ['label' => __('project.select'), 'placeholder' => __('project.all')]) !!}
+        {{ Form::submit(__('app.filter'), ['class' => 'btn btn-info btn-sm']) }}
+        {{ link_to_route('jobs.index', __('app.reset'), [], ['class' => 'btn btn-default btn-sm']) }}
+        {{ Form::close() }}
+    </div>
     <table class="table table-condensed">
         <thead>
             <th>{{ __('app.table_no') }}</th>
@@ -38,9 +46,9 @@
                     @endif
                 </td>
                 <td class="text-center">{{ $job->tasks_count = $job->tasks->count() }}</td>
-                <td class="text-center">{{ formatDecimal($job->progress) }} %</td>
+                <td class="text-center">{{ format_decimal($job->progress) }} %</td>
                 @can('see-pricings', $job)
-                <td class="text-right">{{ formatRp($job->price) }}</td>
+                <td class="text-right">{{ format_money($job->price) }}</td>
                 @endcan
                 <td>{{ $job->worker->name }}</td>
                 <td>
@@ -55,9 +63,9 @@
             <tr>
                 <th class="text-right" colspan="3">{{ __('app.total') }}</th>
                 <th class="text-center">{{ $jobs->sum('tasks_count') }}</th>
-                <th class="text-center">{{ formatDecimal($jobs->avg('progress')) }} %</th>
+                <th class="text-center">{{ format_decimal($jobs->avg('progress')) }} %</th>
                 @can('see-pricings', new App\Entities\Projects\Job)
-                <th class="text-right">{{ formatRp($jobs->sum('price')) }}</th>
+                <th class="text-right">{{ format_money($jobs->sum('price')) }}</th>
                 @endcan
                 <th colspan="2"></th>
             </tr>

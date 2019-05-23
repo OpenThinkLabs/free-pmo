@@ -12,16 +12,31 @@ use App\Http\Controllers\Controller;
  */
 class AgencyController extends Controller
 {
+    /**
+     * Show agency detail page.
+     *
+     * @return \Illuminate\View\View
+     */
     public function show()
     {
         return view('users.agency.show');
     }
 
+    /**
+     * Show agency edit form.
+     *
+     * @return \Illuminate\View\View
+     */
     public function edit()
     {
         return view('users.agency.edit');
     }
 
+    /**
+     * Process agency detail update.
+     *
+     * @return \Illuminate\Routing\Redirector
+     */
     public function update()
     {
         request()->validate([
@@ -32,6 +47,7 @@ class AgencyController extends Controller
             'address' => 'required|string|max:255',
             'city'    => 'required|string|max:100',
             'phone'   => 'required|string|max:255',
+            'tax_id'  => 'nullable|string|max:255',
         ]);
 
         Option::set('agency_name', request('name'));
@@ -41,29 +57,32 @@ class AgencyController extends Controller
         Option::set('agency_address', request('address'));
         Option::set('agency_city', request('city'));
         Option::set('agency_phone', request('phone'));
+        Option::set('agency_tax_id', request('tax_id'));
 
-        flash(trans('agency.updated'), 'success');
+        flash(__('agency.updated'), 'success');
 
         return redirect()->route('users.agency.show');
     }
 
+    /**
+     * Process agency logo upload.
+     *
+     * @return \Illuminate\Routing\Redirector
+     */
     public function logoUpload()
     {
         $file = request()->validate([
             'logo' => 'required|file_extension:png|max:100|dimensions:min_width=100,max_width=200',
         ], [
-            'file_extension' => 'Silakan upload file format <strong>.png</strong>',
+            'logo.file_extension' => __('validation.agency.logo.file_extension'),
         ]);
 
         \File::delete(public_path('assets/imgs/'.Option::get('agency_logo_path')));
 
         $filename = $file['logo']->getClientOriginalName();
-
         $file['logo']->move(public_path('assets/imgs'), $filename);
-
         Option::set('agency_logo_path', $filename);
-
-        flash(trans('agency.updated'), 'success');
+        flash(__('agency.updated'), 'success');
 
         return redirect()->route('users.agency.show');
     }

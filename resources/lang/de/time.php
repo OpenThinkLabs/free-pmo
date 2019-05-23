@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'days'  => 'Day(s)',
     'date'  => 'Datum',
     'month' => 'Monat',
 
@@ -18,4 +19,6 @@ return [
         '11' => 'November',
         '12' => 'Dezember',
     ],
+
+    'updated_at' => 'Last Update',
 ];

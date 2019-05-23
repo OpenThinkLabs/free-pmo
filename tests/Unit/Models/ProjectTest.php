@@ -4,15 +4,22 @@ namespace Tests\Unit\Models;
 
 use Tests\TestCase;
 use App\Entities\Projects\Job;
+use App\Entities\Projects\File;
 use App\Entities\Projects\Task;
+use App\Entities\Projects\Issue;
+use App\Entities\Invoices\Invoice;
 use App\Entities\Payments\Payment;
+use App\Entities\Projects\Comment;
 use App\Entities\Projects\Project;
 use Illuminate\Support\Collection;
 use App\Entities\Partners\Customer;
 use App\Entities\Subscriptions\Subscription;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProjectTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function a_project_has_name_link_method()
     {
@@ -34,6 +41,19 @@ class ProjectTest extends TestCase
         $job = factory(Job::class)->create(['project_id' => $project->id]);
         $this->assertInstanceOf(Collection::class, $project->jobs);
         $this->assertInstanceOf(Job::class, $project->jobs->first());
+    }
+
+    /** @test */
+    public function project_deletion_also_deletes_related_jobs()
+    {
+        $project = factory(Project::class)->create();
+        $job = factory(Job::class)->create(['project_id' => $project->id]);
+
+        $project->delete();
+
+        $this->dontSeeInDatabase('jobs', [
+            'project_id' => $project->id,
+        ]);
     }
 
     /** @test */
@@ -65,12 +85,40 @@ class ProjectTest extends TestCase
     }
 
     /** @test */
-    public function a_project_has_many_payments()
+    public function project_deletion_also_deletes_related_job_tasks()
+    {
+        $project = factory(Project::class)->create();
+        $job = factory(Job::class)->create(['project_id' => $project->id, 'type_id' => 2]);
+        $tasks = factory(Task::class, 2)->create(['job_id' => $job->id]);
+
+        $project->delete();
+
+        $this->dontSeeInDatabase('tasks', [
+            'job_id' => $job->id,
+        ]);
+    }
+
+    /** @test */
+    public function a_project_has_many_payments_relation()
     {
         $project = factory(Project::class)->create();
         $payment = factory(Payment::class)->create(['project_id' => $project->id]);
+
         $this->assertInstanceOf(Collection::class, $project->payments);
         $this->assertInstanceOf(Payment::class, $project->payments->first());
+    }
+
+    /** @test */
+    public function project_deletion_also_deletes_related_payments()
+    {
+        $project = factory(Project::class)->create();
+        $payment = factory(Payment::class)->create(['project_id' => $project->id]);
+
+        $project->delete();
+
+        $this->dontSeeInDatabase('payments', [
+            'project_id' => $project->id,
+        ]);
     }
 
     /** @test */
@@ -80,6 +128,19 @@ class ProjectTest extends TestCase
         $subscription = factory(Subscription::class)->create(['project_id' => $project->id]);
         $this->assertInstanceOf(Collection::class, $project->subscriptions);
         $this->assertInstanceOf(Subscription::class, $project->subscriptions->first());
+    }
+
+    /** @test */
+    public function project_deletion_also_deletes_related_subscriptions()
+    {
+        $project = factory(Project::class)->create();
+        $subscription = factory(Subscription::class)->create(['project_id' => $project->id]);
+
+        $project->delete();
+
+        $this->dontSeeInDatabase('subscriptions', [
+            'project_id' => $project->id,
+        ]);
     }
 
     /** @test */
@@ -164,7 +225,27 @@ class ProjectTest extends TestCase
     public function a_project_has_many_files()
     {
         $project = factory(Project::class)->create();
+
         $this->assertInstanceOf(Collection::class, $project->files);
+    }
+
+    /** @test */
+    public function project_deletion_also_deletes_related_files()
+    {
+        $project = factory(Project::class)->create();
+        $file = File::create([
+            'fileable_id'   => $project->id,
+            'fileable_type' => 'projects',
+            'filename'      => 'filename.jpg',
+            'title'         => 'filename.jpg',
+        ]);
+
+        $project->delete();
+
+        $this->dontSeeInDatabase('files', [
+            'fileable_id'   => $project->id,
+            'fileable_type' => 'projects',
+        ]);
     }
 
     /** @test */
@@ -194,5 +275,90 @@ class ProjectTest extends TestCase
         // $collectibeEarnings = 400 + 900 + 1500 + 1500;
 
         $this->assertEquals($collectibeEarnings, $project->getCollectibeEarnings());
+    }
+
+    /** @test */
+    public function a_project_has_many_comments_relation()
+    {
+        $project = factory(Project::class)->create();
+        $comment = factory(Comment::class)->create([
+            'commentable_type' => 'projects',
+            'commentable_id'   => $project->id,
+        ]);
+
+        $this->assertInstanceOf(Collection::class, $project->comments);
+        $this->assertInstanceOf(Comment::class, $project->comments->first());
+    }
+
+    /** @test */
+    public function project_deletion_also_deletes_related_comments()
+    {
+        $project = factory(Project::class)->create();
+        $comment = factory(Comment::class)->create([
+            'commentable_type' => 'projects',
+            'commentable_id'   => $project->id,
+        ]);
+
+        $project->delete();
+
+        $this->dontSeeInDatabase('comments', [
+            'commentable_type' => 'projects',
+            'commentable_id'   => $project->id,
+        ]);
+    }
+
+    /** @test */
+    public function project_has_work_duration_attribute()
+    {
+        $project = factory(Project::class)->create([
+            'start_date' => '2016-06-10',
+            'end_date'   => '2016-07-21',
+        ]);
+
+        $this->assertEquals('1 Month(s) 11 Day(s)', $project->work_duration);
+    }
+
+    /** @test */
+    public function project_work_duration_attribute_returns_proper_multi_years_work_duration()
+    {
+        $project = factory(Project::class)->create([
+            'start_date' => '2015-04-10',
+            'end_date'   => '2017-07-21',
+        ]);
+
+        $this->assertEquals('2 Year(s) 3 Month(s)', $project->work_duration);
+    }
+
+    /** @test */
+    public function a_project_has_many_invoices_relation()
+    {
+        $project = factory(Project::class)->create();
+        $invoice = factory(Invoice::class)->create(['project_id' => $project->id]);
+
+        $this->assertInstanceOf(Collection::class, $project->invoices);
+        $this->assertInstanceOf(Invoice::class, $project->invoices->first());
+    }
+
+    /** @test */
+    public function project_deletion_also_deletes_related_invoices()
+    {
+        $project = factory(Project::class)->create();
+        $invoice = factory(Invoice::class)->create(['project_id' => $project->id]);
+
+        $project->delete();
+
+        $this->dontSeeInDatabase('invoices', [
+            'project_id' => $project->id,
+        ]);
+    }
+
+    /** @test */
+    public function a_project_has_many_issues_relation()
+    {
+        $project = factory(Project::class)->create();
+        $issue = factory(Issue::class)->create(['project_id' => $project->id]);
+
+        $this->assertInstanceOf(Collection::class, $project->issues);
+        $this->assertInstanceOf(Issue::class, $project->issues->first());
     }
 }

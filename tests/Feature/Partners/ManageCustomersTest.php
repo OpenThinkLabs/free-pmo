@@ -2,13 +2,13 @@
 
 namespace Tests\Feature;
 
-use Tests\TestCase as TestCase;
+use Tests\TestCase;
 use App\Entities\Partners\Customer;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ManageCustomersTest extends TestCase
 {
-    use DatabaseMigrations;
+    use RefreshDatabase;
 
     /** @test */
     public function user_can_see_customer_list_in_customer_index_page()

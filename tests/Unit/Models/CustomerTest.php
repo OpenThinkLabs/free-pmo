@@ -2,16 +2,19 @@
 
 namespace Tests\Unit\Models;
 
-use Tests\TestCase as TestCase;
+use Tests\TestCase;
 use App\Entities\Invoices\Invoice;
 use App\Entities\Payments\Payment;
 use App\Entities\Projects\Project;
 use Illuminate\Support\Collection;
 use App\Entities\Partners\Customer;
 use App\Entities\Subscriptions\Subscription;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class CustomerTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function a_customer_has_many_projects()
     {
@@ -26,7 +29,10 @@ class CustomerTest extends TestCase
     public function a_customer_has_many_payments_relation()
     {
         $customer = factory(Customer::class)->create();
-        $payment = factory(Payment::class)->create(['partner_id' => $customer->id]);
+        $payment = factory(Payment::class)->create([
+            'partner_id'   => $customer->id,
+            'partner_type' => 'App\Entities\Partners\Customer',
+        ]);
 
         $this->assertInstanceOf(Collection::class, $customer->payments);
         $this->assertInstanceOf(Payment::class, $customer->payments->first());

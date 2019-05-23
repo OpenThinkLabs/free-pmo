@@ -66,7 +66,7 @@
         <tfoot>
             <tr>
                 <th class="text-right" colspan="2">{{ __('app.total') }}</th>
-                <th class="text-center">{{ formatDecimal($job->tasks->avg('progress')) }} %</th>
+                <th class="text-center">{{ format_decimal($job->tasks->avg('progress')) }} %</th>
                 <th>
                     @if (request('action') == 'sort_tasks')
                         {{ link_to_route('jobs.show', __('app.done'), [$job], ['class' => 'btn btn-default btn-xs pull-right']) }}
@@ -80,6 +80,31 @@
     @endif
 </div>
 
+@if (Request::has('action') == false)
+@can('create', new App\Entities\Projects\Task)
+{{ Form::open(['route' => ['tasks.store', $job->id]]) }}
+<div class="panel panel-default">
+    <div class="panel-heading"><h3 class="panel-title">{{ __('task.create') }}</h3></div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-sm-6">{!! FormField::text('name', ['label' => __('task.name')]) !!}</div>
+            <div class="col-md-4">
+                {{ Form::label('progress', __('task.progress'), ['class' => 'control-label']) }}
+                {{ Form::input('range', 'progress', 0, [
+                    'min' => '0', 'max' => '100', 'step' => '10',
+                ]) }}
+            </div>
+            <div class="col-md-2" style="font-size: 28px; margin-top: 15px;">
+                <strong id="ap_weight">0</strong>%
+            </div>
+        </div>
+        {!! FormField::textarea('description', ['label' => __('task.description')]) !!}
+        {{ Form::submit(__('task.create'), ['class' => 'btn btn-primary']) }}
+        {{ Form::close() }}
+    </div>
+</div>
+@endcan
+@endif
 @if (request('action') == 'sort_tasks')
 
 @section('ext_js')

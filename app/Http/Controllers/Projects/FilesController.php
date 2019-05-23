@@ -43,10 +43,10 @@ class FilesController extends Controller
             'description'   => 'nullable|max:255',
         ]);
 
-        $fileableExist = array_search($request->get('fileable_type'), $this->fileableTypes);
+        $fileableType = array_search($request->get('fileable_type'), $this->fileableTypes);
 
-        if ($fileableExist) {
-            $file = $this->proccessPhotoUpload($request->except('_token'), $request->get('fileable_type'), $fileableId);
+        if ($fileableType) {
+            $file = $this->proccessPhotoUpload($request->except('_token'), $fileableType, $fileableId);
 
             if ($file->exists) {
                 flash('Upload file berhasil.', 'success');
@@ -70,7 +70,7 @@ class FilesController extends Controller
             return response()->download(storage_path('app/public/files/'.$file->filename), $file->title.'.'.$extension);
         }
 
-        flash(trans('file.not_found'), 'danger');
+        flash(__('file.not_found'), 'danger');
 
         if (\URL::previous() != \URL::current()) {
             return back();
@@ -85,11 +85,17 @@ class FilesController extends Controller
         $file->description = $request->get('description');
         $file->save();
 
-        flash(trans('file.updated'), 'success');
+        flash(__('file.updated'), 'success');
 
-        $resourceName = array_search($file->fileable_type, $this->fileableTypes);
+        return redirect()->route($file->fileable_type.'.files', $file->fileable_id);
+    }
 
-        return redirect()->route($resourceName.'.files', $file->fileable_id);
+    public function destroy(Request $request, File $file)
+    {
+        $file->delete();
+        flash(__('file.deleted'), 'warning');
+
+        return redirect()->route($file->fileable_type.'.files', $file->fileable_id);
     }
 
     private function proccessPhotoUpload($data, $fileableType, $fileableId)
@@ -103,13 +109,7 @@ class FilesController extends Controller
         $fileData['title'] = $data['title'];
         $fileData['description'] = $data['description'];
         \DB::beginTransaction();
-        // dd(is_dir(storage_path('app/public/files')));
-        if (env('APP_ENV') == 'testing') {
-            $file->store('public/files', 'avatar');
-        } else {
-            $file->store('public/files');
-        }
-        // $file->move(storage_path('app/public/files'));
+        $file->store('public/files');
         $file = File::create($fileData);
         \DB::commit();
 

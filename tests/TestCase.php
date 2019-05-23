@@ -3,22 +3,11 @@
 namespace Tests;
 
 use App\Entities\Users\User;
-use Tests\Traits\DatabaseMigrateSeeds;
 use Laravel\BrowserKitTesting\TestCase as BaseTestCase;
 
 abstract class TestCase extends BaseTestCase
 {
-    use CreatesApplication, DatabaseMigrateSeeds;
-
-    protected function setUpTraits()
-    {
-        parent::setUpTraits();
-        $uses = array_flip(class_uses_recursive(static::class));
-
-        if (isset($uses[DatabaseMigrateSeeds::class])) {
-            $this->runDatabaseMigrateSeeds();
-        }
-    }
+    use CreatesApplication;
 
     protected function adminUserSigningIn($userDataOverrides = [])
     {
@@ -44,7 +33,7 @@ abstract class TestCase extends BaseTestCase
         return $user;
     }
 
-    protected function assertFileExistsThenDelete($filePath, $message = null)
+    protected function assertFileExistsThenDelete($filePath, $message = '')
     {
         $this->assertTrue(file_exists($filePath), $message);
 

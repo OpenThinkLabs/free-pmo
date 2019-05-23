@@ -4,9 +4,12 @@ namespace Tests\Unit\Services;
 
 use Option;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class SiteOptionTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function option_can_be_set()
     {

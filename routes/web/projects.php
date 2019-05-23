@@ -38,12 +38,32 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Projects'], function () 
     Route::post('projects/{project}/jobs-reorder', ['as' => 'projects.jobs-reorder', 'uses' => 'ProjectsController@jobsReorder']);
 
     /*
+     * Project Comments Routes
+     */
+    Route::get('projects/{project}/comments', 'CommentsController@index')->name('projects.comments.index');
+    Route::post('projects/{project}/comments', 'CommentsController@store')->name('projects.comments.store');
+    Route::patch('projects/{project}/comments/{comment}', 'CommentsController@update')->name('projects.comments.update');
+    Route::delete('projects/{project}/comments/{comment}', 'CommentsController@destroy')->name('projects.comments.destroy');
+
+    /*
+     * Project Issues Routes
+     */
+    Route::get('projects/{project}/issues', 'IssueController@index')->name('projects.issues.index');
+    Route::get('projects/{project}/issues/create', 'IssueController@create')->name('projects.issues.create');
+    Route::post('projects/{project}/issues', 'IssueController@store')->name('projects.issues.store');
+    Route::get('projects/{project}/issues/{issue}', 'IssueController@show')->name('projects.issues.show');
+    Route::get('projects/{project}/issues/{issue}/edit', 'IssueController@edit')->name('projects.issues.edit');
+    Route::patch('projects/{project}/issues/{issue}', 'IssueController@update')->name('projects.issues.update');
+    Route::delete('projects/{project}/issues/{issue}', 'IssueController@destroy')->name('projects.issues.destroy');
+
+    /*
      * Tasks Routes
      */
     Route::get('jobs/{job}/tasks/create', ['as' => 'tasks.create', 'uses' => 'TasksController@create']);
     Route::post('jobs/{job}/tasks', ['as' => 'tasks.store', 'uses' => 'TasksController@store']);
     Route::patch('tasks/{task}', ['as' => 'tasks.update', 'uses' => 'TasksController@update']);
     Route::delete('tasks/{task}', ['as' => 'tasks.destroy', 'uses' => 'TasksController@destroy']);
+    Route::post('tasks/{task}/set-as-job', ['as' => 'tasks.set-as-job', 'uses' => 'TasksController@setAsJob']);
 
     /*
      * Files Routes
@@ -52,6 +72,7 @@ Route::group(['middleware' => ['auth'], 'namespace' => 'Projects'], function () 
     Route::post('files/{fileable}', ['as' => 'files.upload', 'uses' => 'FilesController@create']);
     Route::get('files/{file}', ['as' => 'files.download', 'uses' => 'FilesController@show']);
     Route::patch('files/{file}', ['as' => 'files.update', 'uses' => 'FilesController@update']);
+    Route::delete('files/{file}', ['as' => 'files.destroy', 'uses' => 'FilesController@destroy']);
 });
 
 Route::group(['middleware' => ['auth']], function () {
@@ -61,9 +82,6 @@ Route::group(['middleware' => ['auth']], function () {
      */
     Route::get('jobs', ['as' => 'jobs.index', 'uses' => 'JobsController@index']);
     Route::get('jobs/{job}', ['as' => 'jobs.show', 'uses' => 'JobsController@show']);
-});
-
-Route::group(['middleware' => ['auth']], function () {
 
     /*
      * Job Actions Routes
@@ -73,4 +91,24 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('jobs/{job}/delete', ['as' => 'jobs.delete', 'uses' => 'JobsController@delete']);
     Route::delete('jobs/{job}', ['as' => 'jobs.destroy', 'uses' => 'JobsController@destroy']);
     Route::post('jobs/{id}/tasks-reorder', ['as' => 'jobs.tasks-reorder', 'uses' => 'JobsController@tasksReorder']);
+
+    /*
+     * Project Comments Routes
+     */
+    Route::get('jobs/{job}/comments', 'Jobs\CommentsController@index')->name('jobs.comments.index');
+    Route::post('jobs/{job}/comments', 'Jobs\CommentsController@store')->name('jobs.comments.store');
+    Route::patch('jobs/{job}/comments/{comment}', 'Jobs\CommentsController@update')->name('jobs.comments.update');
+    Route::delete('jobs/{job}/comments/{comment}', 'Jobs\CommentsController@destroy')->name('jobs.comments.destroy');
 });
+
+/*
+ * Issue Options Routes
+ */
+Route::patch('issues/{issue}/options', 'Issues\OptionController@update')->name('issues.options.update');
+
+/*
+ * Issue Comments Routes
+ */
+Route::post('issues/{issue}/comments', 'Issues\CommentController@store')->name('issues.comments.store');
+Route::patch('issues/{issue}/comments/{comment}', 'Issues\CommentController@update')->name('issues.comments.update');
+Route::delete('issues/{issue}/comments/{comment}', 'Issues\CommentController@destroy')->name('issues.comments.destroy');

@@ -6,13 +6,16 @@ use Storage;
 use Tests\TestCase;
 use Illuminate\Http\UploadedFile;
 use App\Entities\Projects\Project;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class UploadFilesTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function user_can_upload_document_to_a_project()
     {
-        Storage::fake('avatar');
+        Storage::fake(config('filesystem.default'));
         $user = $this->adminUserSigningIn();
         $project = factory(Project::class)->create();
         $this->visit(route('projects.files', $project->id));
@@ -29,25 +32,21 @@ class UploadFilesTest extends TestCase
 
         $this->seeInDatabase('files', [
             'fileable_id'   => $project->id,
-            'fileable_type' => 'App\Entities\Projects\Project',
+            'fileable_type' => 'projects',
             'title'         => 'Judul file',
             'description'   => 'Deskripsi file yang diuplod.',
         ]);
 
         $file = $project->files->first();
-        Storage::disk('avatar')->assertExists('public/files/'.$file->filename);
+        Storage::assertExists('public/files/'.$file->filename);
     }
 
     /** @test */
     public function user_can_edit_document_file_on_a_project()
     {
-        Storage::fake('avatar');
+        Storage::fake(config('filesystem.default'));
         $user = $this->adminUserSigningIn();
         $project = factory(Project::class)->create();
-        // $file = factory(File::class, 'project')->create(['fileable_id' => $project->id]);
-        // dd(get_class_methods((new FileFactory)->create('123.txt')));
-        // $result = Storage::disk('avatar')->put('public/files', (new FileFactory)->create('123.txt'));
-        // dd($result);
 
         $this->visit(route('projects.files', [$project->id]));
 
@@ -71,11 +70,42 @@ class UploadFilesTest extends TestCase
 
         $this->seeInDatabase('files', [
             'fileable_id'   => $project->id,
-            'fileable_type' => 'App\Entities\Projects\Project',
+            'fileable_type' => 'projects',
             'title'         => 'Edit Judul file',
             'description'   => 'Edit Deskripsi file yang diuplod.',
         ]);
 
-        Storage::disk('avatar')->assertExists('public/files/'.$file->filename);
+        Storage::assertExists('public/files/'.$file->filename);
+    }
+
+    /** @test */
+    public function user_can_delete_document_file_on_a_project()
+    {
+        Storage::fake(config('filesystem.default'));
+        $user = $this->adminUserSigningIn();
+        $project = factory(Project::class)->create();
+
+        $this->visit(route('projects.files', $project));
+
+        $this->attach(UploadedFile::fake()->image('avatar.jpg'), 'file');
+        $this->type('Judul file', 'title');
+        $this->type('Deskripsi file yang diuplod.', 'description');
+        $this->press(__('file.upload'));
+
+        $this->assertCount(1, $project->files);
+
+        $file = $project->files->first();
+        Storage::assertExists('public/files/'.$file->filename);
+
+        $this->visit(route('projects.files', $project));
+        $this->click('delete-file-'.$file->id);
+        $this->seePageIs(route('projects.files', [$project, 'action' => 'delete', 'id' => $file->id]));
+
+        $this->press(__('app.delete_confirm_button'));
+
+        $this->seePageIs(route('projects.files', $project));
+        $this->seeText(__('file.deleted'));
+        $this->dontSeeInDatabase('files', ['id' => $file->id]);
+        Storage::assertMissing('public/files/'.$file->filename);
     }
 }

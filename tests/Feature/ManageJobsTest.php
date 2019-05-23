@@ -8,6 +8,7 @@ use App\Entities\Projects\Job;
 use App\Entities\Projects\Task;
 use App\Entities\Projects\Project;
 use App\Entities\Partners\Customer;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /**
  * Manage Project Feature Test.
@@ -16,6 +17,8 @@ use App\Entities\Partners\Customer;
  */
 class ManageJobsTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function admin_can_entry_job()
     {
@@ -31,21 +34,25 @@ class ManageJobsTest extends TestCase
         $this->seePageIs(route('projects.jobs.create', $project->id));
 
         $this->submitForm(trans('job.create'), [
-            'name'        => 'Nama Fitur Baru',
-            'price'       => 100000,
-            'worker_id'   => $worker->id,
-            'type_id'     => 1,
-            'description' => 'Similique, eligendi fuga animi?',
+            'name'              => 'Nama Fitur Baru',
+            'price'             => 100000,
+            'worker_id'         => $worker->id,
+            'type_id'           => 1,
+            'target_start_date' => '2017-04-04',
+            'target_end_date'   => '2017-07-07',
+            'description'       => 'Similique, eligendi fuga animi?',
         ]);
 
         $this->see(trans('job.created'));
 
         $this->seeInDatabase('jobs', [
-            'name'       => 'Nama Fitur Baru',
-            'price'      => 100000,
-            'worker_id'  => $worker->id,
-            'type_id'    => 1,
-            'project_id' => $project->id,
+            'name'              => 'Nama Fitur Baru',
+            'price'             => 100000,
+            'worker_id'         => $worker->id,
+            'type_id'           => 1,
+            'project_id'        => $project->id,
+            'target_start_date' => '2017-04-04',
+            'target_end_date'   => '2017-07-07',
         ]);
     }
 
@@ -64,10 +71,14 @@ class ManageJobsTest extends TestCase
         $this->visit(route('jobs.edit', $job->id));
 
         $this->submitForm(trans('job.update'), [
-            'name'      => 'Nama Fitur Edit',
-            'price'     => 33333,
-            'worker_id' => $users[2]->id,
-            'type_id'   => 2,
+            'name'              => 'Nama Fitur Edit',
+            'price'             => 33333,
+            'worker_id'         => $users[2]->id,
+            'type_id'           => 2,
+            'target_start_date' => '2017-04-04',
+            'target_end_date'   => '2017-07-07',
+            'actual_start_date' => '2017-04-04',
+            'actual_end_date'   => '2017-07-07',
         ]);
 
         $this->seePageIs(route('jobs.show', $job->id));
@@ -75,11 +86,15 @@ class ManageJobsTest extends TestCase
         $this->see(trans('job.updated'));
 
         $this->seeInDatabase('jobs', [
-            'name'       => 'Nama Fitur Edit',
-            'price'      => 33333,
-            'worker_id'  => $users[2]->id,
-            'project_id' => $project->id,
-            'type_id'    => 2,
+            'name'              => 'Nama Fitur Edit',
+            'price'             => 33333,
+            'worker_id'         => $users[2]->id,
+            'project_id'        => $project->id,
+            'type_id'           => 2,
+            'target_start_date' => '2017-04-04',
+            'target_end_date'   => '2017-07-07',
+            'actual_start_date' => '2017-04-04',
+            'actual_end_date'   => '2017-07-07',
         ]);
     }
 
@@ -127,7 +142,7 @@ class ManageJobsTest extends TestCase
         $this->seePageIs(route('jobs.show', $project->id));
         $this->see(trans('job.detail'));
         $this->see($job->name);
-        $this->see(formatRp($job->price));
+        $this->see(format_money($job->price));
         $this->see($job->worker->name);
     }
 
@@ -190,5 +205,41 @@ class ManageJobsTest extends TestCase
 
         $this->visit(route('jobs.index'));
         $this->seePageIs(route('jobs.index'));
+    }
+
+    /** @test */
+    public function admin_can_upgrade_a_task_to_become_job()
+    {
+        $user = $this->adminUserSigningIn();
+
+        $project = factory(Project::class)->create();
+        $job = factory(Job::class)->create([
+            'project_id' => $project->id,
+            'type_id'    => 1,
+            'worker_id'  => $user->id,
+        ]);
+        $task = factory(Task::class)->create([
+            'name'        => 'This is a Task',
+            'job_id'      => $job->id,
+            'description' => 'Task description.',
+        ]);
+
+        $this->visitRoute('jobs.show', [$job, 'action' => 'task_edit', 'task_id' => $task->id]);
+        $this->seeRouteIs('jobs.show', [$job, 'action' => 'task_edit', 'task_id' => $task->id]);
+        $this->seeElement('button', ['id' => 'set-as-job-'.$task->id]);
+
+        $this->press('set-as-job-'.$task->id);
+
+        $newJob = Job::where('name', 'This is a Task')->first();
+        $this->seeRouteIs('jobs.edit', $newJob);
+
+        $this->seeInDatabase('jobs', [
+            'id'          => $newJob->id,
+            'name'        => 'This is a Task',
+            'description' => 'Task description.',
+        ]);
+        $this->dontSeeInDatabase('tasks', [
+            'id' => $task->id,
+        ]);
     }
 }

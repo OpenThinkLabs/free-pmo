@@ -4,19 +4,27 @@
 
 @section('content')
 
-<div class="">
-    <div class="row">
-        <div class="col-md-12">
-            <div class="x_panel">
-                <div class="x_title"><h3>User Calendar <small>Click to add/edit events</small></h3></div>
-                <div class="x_content">
-                    <div id='calendar'></div>
+<div class="row">
+    <div class="col-md-12">
+        <div class="x_panel">
+            <div class="x_title">
+                <div class="pull-right">
+                    @if (request('action') == 'edit')
+                        {{ link_to_route('users.calendar', __('app.done'), [], ['class' => 'btn btn-default btn-xs']) }}
+                    @else
+                        {{ link_to_route('users.calendar', __('event.edit'), ['action' => 'edit'], ['class' => 'btn btn-warning btn-xs']) }}
+                    @endif
                 </div>
+                <h3>
+                    User Calendar <small>Click to add/edit events</small>
+                </h3>
+            </div>
+            <div class="x_content">
+                <div id='calendar'></div>
             </div>
         </div>
     </div>
 </div>
-
 
 <!-- calendar modal -->
 <div id="CalenderModalNew" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
@@ -127,7 +135,6 @@
 <div id="fc_create" data-toggle="modal" data-target="#CalenderModalNew"></div>
 <div id="fc_edit" data-toggle="modal" data-target="#CalenderModalEdit"></div>
 <!-- /calendar modal -->
-
 @endsection
 
 @section('ext_css')
@@ -140,6 +147,7 @@
 @endsection
 
 @section('script')
+<script src="{{ asset('assets/js/plugins/noty.js') }}"></script>
 <script>
     (function() {
         var date = new Date(),
@@ -148,6 +156,7 @@
         y = date.getFullYear(),
         started,
         categoryClass;
+        var selectable = "{{ request('action') }}" == 'edit';
 
         var calendar = $('#calendar').fullCalendar({
             header: {
@@ -157,7 +166,7 @@
             },
             defaultView: 'agendaWeek',
             height: 550,
-            selectable: true,
+            selectable: selectable,
             selectHelper: true,
             minTime: '06:00:00',
             // eventLimit: true,
@@ -166,7 +175,7 @@
             slotLabelFormat: 'HH:mm',
             slotDuration: '01:00:00',
             events: {
-                url: "{{ route('api.events.index') }}",
+                url: "{{ route('api.events.index', request(['action'])) }}",
                 type: "GET",
                 error: function() {
                     alert('there was an error while fetching events!');
@@ -191,20 +200,19 @@
                             method: "POST",
                             data: { title: title, body: body, project_id: project_id, start: started.format("YYYY-MM-DD HH:mm:ss"), end: ended.format("YYYY-MM-DD HH:mm:ss"), is_allday: is_allday },
                             success: function(response){
-                                if(response.message == 'event.created') {
-                                    calendar.fullCalendar('renderEvent', {
-                                        id: response.data.id,
-                                        title: title,
-                                        body: body,
-                                        start: started.format("YYYY-MM-DD HH:mm"),
-                                        end: ended.format("YYYY-MM-DD HH:mm"),
-                                        user: "{{ auth()->user()->name }}",
-                                        user_id: "{{ auth()->id() }}",
-                                        project_id: project_id,
-                                        allDay: is_allday,
-                                        editable: true
-                                    }, true);
-                                }
+                                calendar.fullCalendar('renderEvent', {
+                                    id: response.data.id,
+                                    title: title,
+                                    body: body,
+                                    start: started.format("YYYY-MM-DD HH:mm"),
+                                    end: ended.format("YYYY-MM-DD HH:mm"),
+                                    user: "{{ auth()->user()->name }}",
+                                    user_id: "{{ auth()->id() }}",
+                                    project_id: project_id,
+                                    allDay: is_allday,
+                                    editable: true
+                                }, true);
+                                noty({type: 'success', layout: 'bottomRight', text: response.message, timeout: 3000});
                             },
                             error: function(e){
                                 alert('Error processing your request: '+e.responseText);
@@ -252,9 +260,8 @@
                             },
                             data: { id: calEvent.id },
                             success: function(response){
-                                if(response.message == 'event.deleted')
-                                    calendar.fullCalendar('removeEvents', calEvent.id);
-                                    console.log(calEvent);
+                                noty({type: 'warning', layout: 'bottomRight', text: response.message, timeout: 3000});
+                                calendar.fullCalendar('removeEvents', calEvent.id);
                             },
                             error: function(e){
                                 alert('Error processing your request: '+e.responseText);
@@ -277,9 +284,8 @@
                         method: "PATCH",
                         data: { id: calEvent.id, title: calEvent.title, body: calEvent.body, project_id: calEvent.project_id, is_allday: calEvent.is_allday },
                         success: function(response){
-                            if(response.message == 'event.updated')
-                                $('#calendar').fullCalendar('updateEvent',calEvent);
-                                console.log(calEvent);
+                            noty({type: 'success', layout: 'bottomRight', text: response.message, timeout: 3000});
+                            $('#calendar').fullCalendar('updateEvent',calEvent);
                         },
                         error: function(e){
                             alert('Error processing your request: '+e.responseText);
@@ -300,10 +306,9 @@
                 $.ajax({
                     url: "{{ route('api.events.reschedule') }}",
                     method: "PATCH",
-                    data: { id: calEvent.id, start: start, end: end },
+                    data: { id: calEvent.id, start: start, end: end, is_allday: calEvent.allDay },
                     success: function(response){
-                        if(response.message != 'event.rescheduled')
-                            revertFunc();
+                        noty({type: 'success', layout: 'bottomRight', text: response.message, timeout: 3000});
                     },
                     error: function(e){
                         revertFunc();
@@ -317,17 +322,15 @@
                 $.ajax({
                     url: "{{ route('api.events.reschedule') }}",
                     method: "PATCH",
-                    data: { id: calEvent.id, start: start, end: end },
+                    data: { id: calEvent.id, start: start, end: end, is_allday: 'false' },
                     success: function(response){
-                        if(response.message != 'event.rescheduled')
-                            revertFunc();
+                        noty({type: 'success', layout: 'bottomRight', text: response.message, timeout: 3000});
                     },
                     error: function(e){
                         revertFunc();
                         alert('Error processing your request: '+e.responseText);
                     }
                 });
-
             }
         });
     })();

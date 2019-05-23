@@ -77,7 +77,7 @@ return [
     'string'               => 'Isian :attribute harus berupa string.',
     'timezone'             => 'Isian :attribute harus berupa zona waktu yang valid.',
     'unique'               => 'Isian :attribute sudah ada sebelumnya.',
-    'url'                  => 'Format isian :attribute tidak valid.',
+    'url'                  => 'Mohon isi domain yang valid beserta http/https.',
 
     /*
     |---------------------------------------------------------------------------------------
@@ -90,9 +90,17 @@ return [
     |
     */
 
-    'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+    'project' => [
+        'customer_name'  => [
+            'required_without' => 'Nama customer wajib diisi.',
+        ],
+        'customer_email' => [
+            'required_without' => 'Email customer wajib diisi.',
+        ],
+    ],
+    'agency'  => [
+        'logo' => [
+            'file_extension' => 'Silakan upload file format <strong>.png</strong>',
         ],
     ],
 

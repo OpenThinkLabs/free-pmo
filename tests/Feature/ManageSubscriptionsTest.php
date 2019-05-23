@@ -6,9 +6,12 @@ use Tests\TestCase;
 use App\Entities\Partners\Vendor;
 use App\Entities\Projects\Project;
 use App\Entities\Subscriptions\Subscription;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ManageSubscriptionsTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function admin_can_entry_subscription()
     {
@@ -108,8 +111,8 @@ class ManageSubscriptionsTest extends TestCase
         $this->visit(route('subscriptions.show', $subscription->id));
 
         $this->see($subscription->name);
-        $this->see(formatRp($subscription->price));
-        $this->see(dateId($subscription->start_date));
-        $this->see(dateId($subscription->due_date));
+        $this->see(format_money($subscription->price));
+        $this->see(date_id($subscription->start_date));
+        $this->see(date_id($subscription->due_date));
     }
 }

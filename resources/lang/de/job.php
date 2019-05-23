@@ -14,6 +14,11 @@ return [
     'tasks_count'   => 'Beschäftigungsanzahl',
     'empty'         => 'Beschäftigungsliste ist leer.',
     'back_to_index' => 'zurück zur Beschäftigungsliste',
+    'starts'        => 'Starts',
+    'ends'          => 'Ends',
+    'target'        => 'Target',
+    'actual'        => 'Actual',
+    'duration'      => 'Duration',
 
     // Actions
     'create'                 => 'Neue Beschäftigung anlegen',
@@ -31,12 +36,16 @@ return [
     'sort_tasks'             => 'sortiere Aufgabenpriorität',
 
     // Attributes
-    'name'        => 'Beschäftigungsname',
-    'description' => 'Beschreibung',
-    'progress'    => 'Fortschritt',
-    'worker'      => 'Bearbeiter',
-    'price'       => 'Preis',
-    'type'        => 'Beschäftigungstyp',
+    'name'              => 'Beschäftigungsname',
+    'description'       => 'Beschreibung',
+    'progress'          => 'Fortschritt',
+    'worker'            => 'Bearbeiter',
+    'price'             => 'Preis',
+    'type'              => 'Beschäftigungstyp',
+    'target_start_date' => 'Target Start Date',
+    'target_end_date'   => 'Target End Date',
+    'actual_start_date' => 'Actual Start Date',
+    'actual_end_date'   => 'Actual End Date',
 
     // Types
     'main'       => 'Haupt',

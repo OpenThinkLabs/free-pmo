@@ -28,6 +28,7 @@ class EventsController extends Controller
             ->collection($events)
             ->transformWith(function ($event) {
                 $isOwnEvent = $event->user_id == auth()->id();
+                $editable = request('action') == 'edit' ? true : false;
 
                 return [
                     'id'         => $event->id,
@@ -39,7 +40,7 @@ class EventsController extends Controller
                     'start'      => $event->start,
                     'end'        => $event->end,
                     'allDay'     => $event->is_allday,
-                    'editable'   => true,
+                    'editable'   => $editable,
                     'color'      => $isOwnEvent ? '' : '#B7B7B7',
                 ];
             })
@@ -150,10 +151,11 @@ class EventsController extends Controller
 
     public function reschedule(Request $request)
     {
-        $this->validate($request, [
-            'id'    => 'required|numeric|exists:user_events,id',
-            'start' => 'required|date|date_format:Y-m-d H:i:s',
-            'end'   => 'date|date_format:Y-m-d H:i:s',
+        $request->validate([
+            'id'        => 'required|numeric|exists:user_events,id',
+            'start'     => 'required|date|date_format:Y-m-d H:i:s',
+            'end'       => 'nullable|date|date_format:Y-m-d H:i:s',
+            'is_allday' => 'required|in:true,false',
         ]);
 
         $event = Event::findOrFail($request->get('id'));
@@ -163,6 +165,11 @@ class EventsController extends Controller
         if ($request->has('end')) {
             $event->end = $request->get('end');
             $event->is_allday = false;
+        }
+
+        if ($request->get('is_allday') == 'true') {
+            $event->end = null;
+            $event->is_allday = true;
         }
 
         $event->save();

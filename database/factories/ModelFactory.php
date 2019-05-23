@@ -10,7 +10,7 @@ $factory->define(User::class, function (Faker\Generator $faker) {
     return [
         'name'           => $faker->name,
         'email'          => $faker->unique()->email,
-        'password'       => 'member',
+        'password'       => '$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm', // secret
         'remember_token' => str_random(10),
         'api_token'      => str_random(32),
         'lang'           => 'en',
@@ -29,7 +29,7 @@ $factory->define(Job::class, function (Faker\Generator $faker) {
             return factory(User::class)->create()->id;
         },
         'type_id'     => 1, // Main job
-        'position'    => rand(1, 10),
+        'position'    => 1,
     ];
 });
 

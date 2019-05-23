@@ -5,6 +5,7 @@
 @section('content')
 <h1 class="page-header">
     <div class="pull-right">
+        {!! FormField::formButton(['route' => ['invoices.duplication.store', $invoice]], __('invoice.duplicate'), ['class' => 'btn btn-default']) !!}
         {{ link_to_route('invoices.edit', trans('invoice.edit'), [$invoice], ['class' => 'btn btn-warning']) }}
         {{ link_to_route('invoices.pdf', trans('invoice.print'), [$invoice], ['class' => 'btn btn-default']) }}
         {{ link_to_route('projects.invoices', trans('invoice.back_to_project'), [$invoice->project_id], ['class' => 'btn btn-default']) }}
@@ -31,18 +32,37 @@
                         </tr>
                     </thead>
                     <tbody>
+                        @php
+                            $subtotal = 0;
+                        @endphp
                         @foreach($invoice->items as $key => $item)
                         <tr>
                             <td>{{ $key + 1 }}</td>
-                            <td>{{ $item['description'] }}</td>
-                            <td class="text-right">{{ formatRp($item['amount']) }}</td>
+                            <td>{!! nl2br($item['description']) !!}</td>
+                            <td class="text-right">{{ format_money($item['amount']) }}</td>
                         </tr>
+                        @php
+                            $subtotal += $item['amount'];
+                        @endphp
                         @endforeach
                     </tbody>
                     <tfoot>
+                        @if ($invoice->discount)
+                        <tr>
+                            <th colspan="2" class="text-right">{{ __('invoice.subtotal') }} :</th>
+                            <th class="text-right">{{ format_money($subtotal) }}</th>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-right">
+                                <strong>{{ __('invoice.discount') }}</strong>
+                                {{ $invoice->discount_notes ? '('.$invoice->discount_notes.')': '' }} :
+                            </td>
+                            <th class="text-right">- {{ format_money($invoice->discount) }}</th>
+                        </tr>
+                        @endif
                         <tr>
                             <th colspan="2" class="text-right">{{ trans('app.total') }} :</th>
-                            <th class="text-right">{{ formatRp($invoice->amount) }}</th>
+                            <th class="text-right">{{ format_money($invoice->amount) }}</th>
                         </tr>
                     </tfoot>
                 </table>

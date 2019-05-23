@@ -3,6 +3,7 @@
 namespace Tests\Feature\Users;
 
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /**
  * Agency Profile Feature Test.
@@ -11,6 +12,8 @@ use Tests\TestCase;
  */
 class AgencyProfileTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function admin_user_can_visit_agency_page()
     {
@@ -33,6 +36,7 @@ class AgencyProfileTest extends TestCase
             'phone'   => '081234567890',
             'city'    => 'Jakarta',
             'website' => 'https://example.com',
+            'tax_id'  => '14.817.xxx.x-xxx.000',
         ]);
 
         $this->see(trans('agency.updated'));
@@ -65,6 +69,10 @@ class AgencyProfileTest extends TestCase
         $this->seeInDatabase('site_options', [
             'key'   => 'agency_tagline',
             'value' => 'Tagline agensi saya',
+        ]);
+        $this->seeInDatabase('site_options', [
+            'key'   => 'agency_tax_id',
+            'value' => '14.817.xxx.x-xxx.000',
         ]);
     }
 

@@ -26,7 +26,7 @@ class AdminDashboardQuery
     public function totalEarnings($year)
     {
         $totalEarnings = 0;
-        $payments = Payment::where('date', 'like', $year.'%')->get();
+        $payments = Payment::whereYear('date', $year)->get();
         foreach ($payments as $payment) {
             if ($payment->in_out == 1) {
                 $totalEarnings += $payment->amount;
@@ -47,7 +47,7 @@ class AdminDashboardQuery
      */
     public function totalFinishedProjects($year)
     {
-        return Project::where('status_id', 4)->where('start_date', 'like', $year.'%')->count();
+        return Project::where('status_id', 4)->whereYear('start_date', $year)->count();
     }
 
     /**
@@ -61,7 +61,7 @@ class AdminDashboardQuery
     {
         // On Progress, Done, On Hold
         $projects = Project::whereIn('status_id', [2, 3, 6])
-            ->where('start_date', 'like', $year.'%')
+            ->whereYear('start_date', $year)
             ->with('payments')
             ->get();
 
@@ -100,7 +100,7 @@ class AdminDashboardQuery
      *
      * @return int
      */
-    public function onProgressJobs(User $user, array $eagerLoads = [])
+    public function onProgressJobs(User $user, array $eagerLoads = [], $projectId = null)
     {
         $eagerLoads = array_merge(['tasks'], $eagerLoads);
         $jobQuery = Job::whereHas('project', function ($query) {
@@ -109,6 +109,10 @@ class AdminDashboardQuery
 
         if ($user->hasRole('admin') == false) {
             $jobQuery->where('worker_id', $user->id);
+        }
+
+        if ($projectId) {
+            $jobQuery->where('project_id', $projectId);
         }
 
         $jobs = $jobQuery->get()

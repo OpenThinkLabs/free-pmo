@@ -4,6 +4,7 @@ namespace Tests\Feature\Users;
 
 use Tests\TestCase;
 use App\Entities\Users\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 /**
  * Manage Users Feature Test.
@@ -12,6 +13,8 @@ use App\Entities\Users\User;
  */
 class ManageUsersTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function user_can_see_user_list_from_dashboard_tab()
     {
@@ -110,6 +113,11 @@ class ManageUsersTest extends TestCase
             'user_id' => $user2->id,
             'role_id' => 2,
         ]);
+
+        $this->assertTrue(
+            app('hash')->check('password', $user2->fresh()->password),
+            'The password should changed!'
+        );
     }
 
     /** @test */

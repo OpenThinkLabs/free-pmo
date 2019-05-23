@@ -11,14 +11,14 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="text-center">
-                        {!! appLogoImage(['style' => 'width:150px']) !!}
+                        {!! app_logo_image(['style' => 'width:150px']) !!}
                         <h3>{{ config('app.name') }}</h3>
                     </div>
                 </div>
                 <div class="col-sm-6">
                     <p>{{ __('app_install.agency_info_text') }}</p>
                     {!! FormField::text('agency_name', ['required' => true, 'label' => __('agency.name')]) !!}
-                    {!! FormField::text('agency_website', ['required' => true, 'label' => __('agency.website')]) !!}
+                    {!! FormField::text('agency_website', ['label' => __('agency.website'), 'placeholder' => 'https://yourdomain.com']) !!}
                 </div>
             </div>
             <hr style="margin: 10px 0;">

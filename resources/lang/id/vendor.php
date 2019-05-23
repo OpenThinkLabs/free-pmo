@@ -2,13 +2,15 @@
 
 return [
     // Labels
-    'vendor'         => 'Vendor',
-    'list'           => 'Daftar Vendor',
-    'search'         => 'Cari Vendor',
-    'not_found'      => 'Vendor tidak ditemukan',
-    'empty'          => 'Belum ada Vendor',
-    'back_to_show'   => 'Kembali ke detail Vendor',
-    'back_to_index'  => 'Kembali ke daftar Vendor',
+    'vendor'        => 'Vendor',
+    'list'          => 'Daftar Vendor',
+    'detail'        => 'Detail Vendor',
+    'search'        => 'Cari Vendor',
+    'select'        => 'Pilih Vendor',
+    'not_found'     => 'Vendor tidak ditemukan',
+    'empty'         => 'Belum ada Vendor',
+    'back_to_show'  => 'Kembali ke detail Vendor',
+    'back_to_index' => 'Kembali ke daftar Vendor',
 
     // Actions
     'create'         => 'Input Vendor Baru',
@@ -24,6 +26,7 @@ return [
     'undeleteable'   => 'Data Vendor tidak dapat dihapus.',
 
     // Attributes
-    'name'           => 'Nama Vendor',
-    'description'    => 'Deskripsi Vendor',
+    'name'        => 'Nama Vendor',
+    'website'     => 'Website Vendor',
+    'description' => 'Deskripsi Vendor',
 ];

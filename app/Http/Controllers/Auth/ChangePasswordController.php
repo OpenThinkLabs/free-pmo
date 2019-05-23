@@ -17,11 +17,22 @@ class ChangePasswordController extends Controller
         $this->middleware('auth');
     }
 
+    /**
+     * Show user change password form.
+     *
+     * @return \Illuminate\View\View
+     */
     public function show()
     {
         return view('auth.passwords.change');
     }
 
+    /**
+     * Update user password.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Routing\Redirector
+     */
     public function update(Request $request)
     {
         $input = $request->validate([
@@ -32,7 +43,7 @@ class ChangePasswordController extends Controller
 
         if (app('hash')->check($input['old_password'], auth()->user()->password)) {
             $user = auth()->user();
-            $user->password = $input['password'];
+            $user->password = bcrypt($input['password']);
             $user->save();
 
             flash(trans('auth.password_changed'), 'success');

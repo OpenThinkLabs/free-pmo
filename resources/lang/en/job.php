@@ -14,6 +14,11 @@ return [
     'tasks_count'   => 'Tasks Count',
     'empty'         => 'Job list is empty.',
     'back_to_index' => 'Back to Job List',
+    'starts'        => 'Starts',
+    'ends'          => 'Ends',
+    'target'        => 'Target',
+    'actual'        => 'Actual',
+    'duration'      => 'Duration',
 
     // Actions
     'create'                 => 'Create new Job',
@@ -33,12 +38,16 @@ return [
     'created_from_other_project' => 'Job has been added from other Project.',
 
     // Attributes
-    'name'        => 'Job Name',
-    'description' => 'Description',
-    'progress'    => 'Progress',
-    'worker'      => 'Worker',
-    'price'       => 'Price',
-    'type'        => 'Job Type',
+    'name'              => 'Job Name',
+    'description'       => 'Description',
+    'progress'          => 'Progress',
+    'worker'            => 'Worker',
+    'price'             => 'Price',
+    'type'              => 'Job Type',
+    'target_start_date' => 'Target Start Date',
+    'target_end_date'   => 'Target End Date',
+    'actual_start_date' => 'Actual Start Date',
+    'actual_end_date'   => 'Actual End Date',
 
     // Types
     'main'       => 'Main',

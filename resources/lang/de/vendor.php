@@ -4,7 +4,9 @@ return [
     // Labels
     'vendor'        => 'Hersteller',
     'list'          => 'Hersteller Liste',
+    'detail'        => 'Vendor Detail',
     'search'        => 'Hersteller suchen',
+    'select'        => 'Select Vendor',
     'not_found'     => 'Hersteller nicht gefunden.',
     'empty'         => 'Hersteller Liste ist leer.',
     'back_to_show'  => 'Zurück zu Herstellerdetails',
@@ -25,5 +27,6 @@ return [
 
     // Attributes
     'name'        => 'Hersteller Name',
+    'website'     => 'Vendor Website',
     'description' => 'Hersteller Beschreibung',
 ];

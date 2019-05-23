@@ -77,7 +77,7 @@ return [
     'string'               => 'The :attribute must be a string.',
     'timezone'             => 'The :attribute must be a valid zone.',
     'unique'               => 'The :attribute has already been taken.',
-    'url'                  => 'The :attribute format is invalid.',
+    'url'                  => 'Please enter a valid domain with http/https.',
 
     /*
     |--------------------------------------------------------------------------
@@ -90,9 +90,17 @@ return [
     |
     */
 
-    'custom' => [
-        'attribute-name' => [
-            'rule-name' => 'custom-message',
+    'project' => [
+        'customer_name'  => [
+            'required_without' => 'Customer name is required.',
+        ],
+        'customer_email' => [
+            'required_without' => 'Customer email is required.',
+        ],
+    ],
+    'agency'  => [
+        'logo' => [
+            'file_extension' => 'Please upload an image with <strong>.png</strong> format.',
         ],
     ],
 

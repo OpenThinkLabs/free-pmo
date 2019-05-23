@@ -22,6 +22,7 @@ return [
     'save'                => 'Rechnung speichern',
     'created'             => 'Neue Rechnung wurde erstellt.',
     'show'                => 'Rechnungsdetails',
+    'duplicate'           => 'Duplicate Invoice',
     'edit'                => 'Rechnung bearbeiten',
     'update'              => 'Rechnung aktualisieren',
     'updated'             => 'Rechnungsdetails wurden aktualisiert.',
@@ -55,4 +56,7 @@ return [
     'item_description' => 'Beschreibung',
     'item_amount'      => 'Summe',
     'items_count'      => 'Summe Positionen',
+    'subtotal'         => 'Subtotal',
+    'discount'         => 'Discount',
+    'discount_notes'   => 'Discount Notes',
 ];

@@ -22,6 +22,7 @@ return [
     'save'                => 'Simpan Invoice',
     'created'             => 'Input Invoice baru telah berhasil.',
     'show'                => 'Lihat Detail Invoice',
+    'duplicate'           => 'Duplikat Invoice',
     'edit'                => 'Edit Invoice',
     'update'              => 'Update Invoice',
     'updated'             => 'Update data Invoice telah berhasil.',
@@ -55,4 +56,7 @@ return [
     'item_description' => 'Deskripsi',
     'item_amount'      => 'Biaya',
     'items_count'      => 'Jumlah Item',
+    'subtotal'         => 'Subtotal',
+    'discount'         => 'Diskon',
+    'discount_notes'   => 'Catatan Diskon',
 ];

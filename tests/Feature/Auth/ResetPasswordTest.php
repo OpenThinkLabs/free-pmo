@@ -5,9 +5,12 @@ namespace Tests\Feature\Auth;
 use Notification;
 use Tests\TestCase;
 use App\Entities\Users\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ResetPasswordTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function user_can_reset_password_by_their_email()
     {

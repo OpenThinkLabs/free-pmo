@@ -2,12 +2,15 @@
 
 namespace Tests\Unit\Policies;
 
+use Tests\TestCase;
 use App\Entities\Projects\Job;
-use Tests\TestCase as TestCase;
 use App\Entities\Projects\Project;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 
 class ProjectPolicyTest extends TestCase
 {
+    use RefreshDatabase;
+
     /** @test */
     public function only_admin_can_create_project()
     {
@@ -140,5 +143,37 @@ class ProjectPolicyTest extends TestCase
 
         $this->assertTrue($admin->can('see-pricings', $project));
         $this->assertFalse($worker->can('see-pricings', $project));
+    }
+
+    /** @test */
+    public function admin_and_worker_view_project_comment_list()
+    {
+        $admin = $this->createUser('admin');
+        $worker = $this->createUser('worker');
+
+        $project = factory(Project::class)->create();
+        $job = factory(Job::class)->create([
+            'project_id' => $project->id,
+            'worker_id'  => $worker->id,
+        ]);
+
+        $this->assertTrue($admin->can('view-comments', $project));
+        $this->assertTrue($worker->can('view-comments', $project));
+    }
+
+    /** @test */
+    public function admin_and_project_workers_can_add_comment_to_project()
+    {
+        $admin = $this->createUser('admin');
+        $worker = $this->createUser('worker');
+
+        $project = factory(Project::class)->create();
+        $job = factory(Job::class)->create([
+            'project_id' => $project->id,
+            'worker_id'  => $worker->id,
+        ]);
+
+        $this->assertTrue($admin->can('comment-on', $project));
+        $this->assertTrue($worker->can('comment-on', $project));
     }
 }
